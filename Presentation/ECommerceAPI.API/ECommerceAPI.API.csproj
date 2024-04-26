@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -12,6 +12,8 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+    <PackageReference Include="Serilog.Sinks.PostgreSQL" Version="2.3.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
@@ -19,6 +21,7 @@
     <ProjectReference Include="..\..\Core\ECommerceAPI.Application\ECommerceAPI.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\ECommerceAPI.Infrastructure\ECommerceAPI.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Infrastructure\ECommerceAPI.Persistance\ECommerceAPI.Persistance.csproj" />
+    <ProjectReference Include="..\..\Insfrastructure\ECommerceAPI.SignalR\ECommerceAPI.SignalR.csproj" />
   </ItemGroup>
 
   <ItemGroup>

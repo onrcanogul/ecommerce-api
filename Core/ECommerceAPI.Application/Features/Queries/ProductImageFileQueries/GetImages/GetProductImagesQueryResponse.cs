@@ -11,6 +11,7 @@ namespace ECommerceAPI.Application.Features.Queries.ProductImageFileQueries.GetI
         public string Path { get; set; }
         public string FileName { get; set; }
         public Guid Id { get; set; }
+        public bool ShowCase { get; set; }
 
     }
 }

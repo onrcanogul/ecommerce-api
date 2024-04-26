@@ -4,10 +4,12 @@ using ECommerceAPI.Application.DTOs;
 using ECommerceAPI.Application.DTOs.User;
 using ECommerceAPI.Application.Exceptions;
 using ECommerceAPI.Application.Features.Commands.AppUserCommands.Login;
+using ECommerceAPI.Application.Helpers;
 using ECommerceAPI.Domain.Entities.Identity;
 using Google.Apis.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -23,13 +25,17 @@ namespace ECommerceAPI.Persistance.Services
         readonly ITokenHandler _tokenHandler;
         readonly IConfiguration _configuration;
         readonly SignInManager<AppUser> _signInManager;
+        readonly IUserService _userService;
+        readonly IMailService _mailService;
 
-        public AuthService(UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager)
+        public AuthService(UserManager<AppUser> userManager, ITokenHandler tokenHandler, IConfiguration configuration, SignInManager<AppUser> signInManager, IUserService userService, IMailService mailService)
         {
             _userManager = userManager;
             _tokenHandler = tokenHandler;
             _configuration = configuration;
             _signInManager = signInManager;
+            _userService = userService;
+            _mailService = mailService;
         }
 
 
@@ -41,26 +47,28 @@ namespace ECommerceAPI.Persistance.Services
                 user = await _userManager.FindByEmailAsync(email);
                 if (user == null)
                 {
-                      user = new() 
-                    { 
+                    user = new()
+                    {
                         Id = Guid.NewGuid().ToString(),
-                        Email = email, UserName = email,
-                        NameSurname = name 
+                        Email = email,
+                        UserName = email,
+                        NameSurname = name
                     };
-                    IdentityResult createResult = await _userManager.CreateAsync(user);
-                    result = createResult.Succeeded;
-                    if (result)
-                        await _userManager.AddLoginAsync(user, userLoginInfo);
-                    else
-                        throw new Exception("Invalid external authentication");
-                }               
+                    var identityResult = await _userManager.CreateAsync(user);
+                    result = identityResult.Succeeded;
+                }
             }
-            Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
-            return new()
+            if (result)
             {
-                AccessToken = token.AccessToken,
-                Expiration = token.Expiration,
-            };
+                await _userManager.AddLoginAsync(user, userLoginInfo);
+                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime,user);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, token.Expiration, 50);
+                return new() { AccessToken = token.AccessToken, Expiration = token.Expiration , RefreshToken=token.RefreshToken };
+
+            }
+            throw new Exception("Invalid external authentication.");
+
+
 
         }
 
@@ -92,14 +100,52 @@ namespace ECommerceAPI.Persistance.Services
 
             if (result.Succeeded)
             {
-                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime);
+                Token token = _tokenHandler.CreateAccessToken(accessTokenLifeTime,user);
+                await _userService.UpdateRefreshTokenAsync(token.RefreshToken, user, token.Expiration, 900);
                 return new Token
                 {
                     AccessToken = token.AccessToken,
-                    Expiration = token.Expiration
+                    Expiration = token.Expiration,
+                    RefreshToken = token.RefreshToken
                 };
             }
             throw new UserLoginErrorException();
+        }
+
+        public async Task<Token> RefreshTokenLogin(string refreshToken)
+        {
+          AppUser? user =  await _userManager.Users.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+          if(user != null && user?.RefreshTokenEndDate > DateTime.UtcNow)
+          {
+             Token token = _tokenHandler.CreateAccessToken(900,user);
+             await _userService.UpdateRefreshTokenAsync(token.RefreshToken,user, token.Expiration, 50);
+                return token;
+          }
+          else
+            throw new NotFoundUserException();
+        }
+
+        public async Task PasswordResetAsync(string email)
+        {
+            AppUser? user = await _userManager.FindByEmailAsync(email);
+            if(user!=null)
+            {
+               string resetToken =  await _userManager.GeneratePasswordResetTokenAsync(user);
+               resetToken = resetToken.Encode();
+               
+               await _mailService.SendPasswordResetMailAsync(email, user.Id, resetToken);
+            }
+        }
+
+        public async Task<bool> VerifyResetTokenAsync(string resetToken, string userId)
+        {
+            AppUser? user = await _userManager.FindByIdAsync(userId);
+            if(user != null)
+            {
+                resetToken = resetToken.Decode();
+                return await _userManager.VerifyUserTokenAsync(user, _userManager.Options.Tokens.PasswordResetTokenProvider, "ResetPassword", resetToken);
+            }
+            return false;
         }
     }
 }

@@ -11,5 +11,6 @@ namespace ECommerceAPI.Application.Features.Queries.ProductQueries.GetAllProduct
     {
         public int TotalCount { get; set; }
         public object Products { get; set; }
+        public string ImagePath { get; set; }
     }
 }

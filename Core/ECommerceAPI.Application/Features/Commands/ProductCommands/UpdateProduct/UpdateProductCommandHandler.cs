@@ -1,33 +1,28 @@
-﻿using ECommerceAPI.Application.Repositories;
-using ECommerceAPI.Domain.Entities;
+﻿using ECommerceAPI.Application.Abstractions.Services;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Commands.ProductCommands.UpdateProduct
 {
     public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommandRequest, UpdateProductCommandResponse>
     {
-        readonly IProductReadRepository _productReadRepository;
-        readonly IProductWriteRepository _productWriteRepository;
+        
+        readonly IProductService _productService;
 
-        public UpdateProductCommandHandler(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository)
+        public UpdateProductCommandHandler(IProductService productService)
         {
-            _productWriteRepository = productWriteRepository;
-            _productReadRepository = productReadRepository;
+            
+            _productService = productService;
         }
 
         public async Task<UpdateProductCommandResponse> Handle(UpdateProductCommandRequest request, CancellationToken cancellationToken)
         {
-            Product product = await _productReadRepository.GetByIdAsync(request.Id);
-            product.Name = request.Name;
-            product.Price = request.Price;
-            product.Stock = request.Stock;
-            _productWriteRepository.Update(product);
-            await _productWriteRepository.SaveAsync();
+            await _productService.UpdateProduct(request.Id, request.Name, request.Price, request.Stock);
+            //Product product = await _productReadRepository.GetByIdAsync(request.Id);
+            //product.Name = request.Name;
+            //product.Price = request.Price;
+            //product.Stock = request.Stock;
+            //_productWriteRepository.Update(product);
+            //await _productWriteRepository.SaveAsync();
 
             return new();
         }

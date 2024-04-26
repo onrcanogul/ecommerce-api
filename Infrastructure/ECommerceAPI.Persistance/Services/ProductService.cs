@@ -1,15 +1,19 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.DTOs.Product;
 using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Domain.Entities;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace ECommerceAPI.Persistance.Services
 {
@@ -45,9 +49,11 @@ namespace ECommerceAPI.Persistance.Services
             
         }
 
-        public Task DeleteProduct(string productId)
+        public async Task DeleteProduct(string productId)
         {
-            throw new NotImplementedException();
+            var product = await _productReadRepository.GetByIdAsync(productId);
+            await _productWriteRepository.RemoveAsync(productId);
+            await _productWriteRepository.SaveAsync();
         }
 
         public async Task<ListProduct> GetActiveUsersProducts(int page, int size)
@@ -67,23 +73,53 @@ namespace ECommerceAPI.Persistance.Services
             {
                 Products = datas,
                 totalCount = query.Count()
-            };          
-        }
-
-        public async Task GetProductById(string productId)
-        {
-            throw new Exception();
+            };
 
         }
 
-        public Task GetProducts()
+        public async Task<ProductDto> GetProductById(string productId)
         {
-            throw new NotImplementedException();
+            Product product = await _productReadRepository.GetByIdAsync(productId, false);
+            return new()
+            {
+                Id = product.Id.ToString(),
+                Name = product.Name,
+                Price = product.Price,
+                CreatedDate = product.CreatedDate,
+                ProductImageFiles = product.ProductImageFiles,
+                Stock = product.Stock,
+                UpdatedDate = product.UpdatedDate,
+            };
         }
 
-        public Task UpdateProduct(string productId)
+        public ListProduct GetProducts(int page, int size)
         {
-            throw new NotImplementedException();
+            var totalCount = _productReadRepository.GetAll(false).Count();
+            var products = _productReadRepository.GetAll(false).Skip(page * size).Take(size).Include(p => p.ProductImageFiles).Select(p => new
+            {
+                p.Id,
+                p.Name,
+                p.Stock,
+                p.Price,
+                p.CreatedDate,
+                p.UpdatedDate,
+                p.ProductImageFiles,
+            }).ToList();
+            return new()
+            {
+                Products = products,
+                totalCount = totalCount
+            };
+        }
+
+        public async Task UpdateProduct(string productId, string Name, float Price, int Stock)
+        {
+            Product product = await _productReadRepository.GetByIdAsync(productId);
+            product.Name = Name;
+            product.Price = Price;
+            product.Stock = Stock;
+            _productWriteRepository.Update(product);
+            await _productWriteRepository.SaveAsync();
         }
     }
 }

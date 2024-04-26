@@ -1,27 +1,29 @@
-﻿using ECommerceAPI.Application.Repositories;
-using ECommerceAPI.Domain.Entities;
+﻿using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.DTOs.Product;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Queries.ProductQueries.GetByIdProduct
 {
     public class GetByIdProductQueryHandler : IRequestHandler<GetByIdProductQueryRequest, GetByIdProductQueryResponse>
     {
-        readonly IProductReadRepository _productReadRepository;
+        
+        readonly IProductService _productService;
 
-        public GetByIdProductQueryHandler(IProductReadRepository productReadRepository)
+        public GetByIdProductQueryHandler(IProductService productService)
         {
-            _productReadRepository = productReadRepository;
+            
+            _productService = productService;
         }
 
         public async Task<GetByIdProductQueryResponse> Handle(GetByIdProductQueryRequest request, CancellationToken cancellationToken)
         {
-            Product product = await _productReadRepository.GetByIdAsync(request.Id, false);
-            return new() { Product = product};
+            ProductDto product = await _productService.GetProductById(request.Id);
+            return new()
+            {
+                Product = product
+            };
+            //Product product = await _productReadRepository.GetByIdAsync(request.Id, false);
+            //return new() { Product = product};
         }
     }
 }

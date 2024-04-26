@@ -1,32 +1,25 @@
-﻿using ECommerceAPI.Application.Repositories;
-using ECommerceAPI.Domain.Entities;
+﻿using ECommerceAPI.Application.Abstractions.Services;
+using ECommerceAPI.Application.Repositories;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.Features.Commands.ProductCommands.DeleteProduct
 {
     public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommandRequest, DeleteProductCommandResponse>
     {
-        readonly IProductWriteRepository _productWriteRepository;
-        readonly IProductReadRepository _productReadRepository;
         
+        readonly IProductService _productService;
 
-        public DeleteProductCommandHandler(IProductWriteRepository productWriteRepository, IProductReadRepository productReadRepository)
+
+        public DeleteProductCommandHandler(IProductService productService)
         {
-            _productWriteRepository = productWriteRepository;
-           _productReadRepository = productReadRepository;
+            
+            _productService = productService;
         }
 
 
         public async Task<DeleteProductCommandResponse> Handle(DeleteProductCommandRequest request, CancellationToken cancellationToken)
         {
-            var product = await _productReadRepository.GetByIdAsync(request.id);
-            await _productWriteRepository.RemoveAsync(request.id);
-            await _productWriteRepository.SaveAsync();
+            await _productService.DeleteProduct(request.id);
             return new();
         }
     }

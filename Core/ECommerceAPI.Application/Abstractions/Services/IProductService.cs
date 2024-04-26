@@ -10,10 +10,10 @@ namespace ECommerceAPI.Application.Abstractions.Services
     public interface IProductService
     {
         Task CreateProductAsync(CreateProduct product);
-        Task GetProducts();
-        Task GetProductById(string productId);
+        ListProduct GetProducts(int page, int size);
+        Task<ProductDto> GetProductById(string productId);
         Task DeleteProduct(string productId);
-        Task UpdateProduct(string productId);
+        Task UpdateProduct(string productId, string Name, float Price, int Stock);
         Task<ListProduct> GetActiveUsersProducts(int page, int size);
     }
 }

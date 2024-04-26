@@ -1,4 +1,5 @@
-﻿using ECommerceAPI.Domain.Entities;
+﻿using ECommerceAPI.Application.DTOs.Product;
+using ECommerceAPI.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace ECommerceAPI.Application.Features.Queries.ProductQueries.GetByIdProduc
 {
     public class GetByIdProductQueryResponse
     {
-        public Product Product { get; set; }
+        public ProductDto Product { get; set; }
     }
 }

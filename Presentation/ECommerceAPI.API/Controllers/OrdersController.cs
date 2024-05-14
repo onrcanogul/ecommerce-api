@@ -46,7 +46,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
         [HttpGet("{Id}")]
-        [Authorize(AuthenticationSchemes = "Admin",Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Admin",Roles = "admin")]
         [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Orders, Definition = "Get single order by id", Action = ActionType.Reading)]
         public async Task<IActionResult> GetOrderById([FromRoute] GetOrderByIdQueryRequest request)
         {
@@ -54,7 +54,7 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
         [HttpPost("complete-order")]
-        [Authorize(AuthenticationSchemes = "Admin", Roles = "Admin")]
+        [Authorize(AuthenticationSchemes = "Admin", Roles = "admin")]
         [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Orders, Definition = "Complete a order", Action = ActionType.Updating)]
         public async Task<IActionResult> CompleteOrder([FromBody]CompleteOrderCommandRequest request)
         {

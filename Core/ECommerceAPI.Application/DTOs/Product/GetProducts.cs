@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.DTOs.Product
 {
-    public class ListProduct
+    public class GetProducts
     {
         public object Products { get; set; }
         public int totalCount { get; set; }

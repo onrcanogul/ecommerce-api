@@ -1,9 +1,11 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.Abstractions.Services.Authentication;
 using ECommerceAPI.Application.Repositories;
+using ECommerceAPI.Application.Repositories.Category;
 using ECommerceAPI.Domain.Entities.Identity;
 using ECommerceAPI.Persistance.Contexts;
 using ECommerceAPI.Persistance.Repositories;
+using ECommerceAPI.Persistance.Repositories.Category;
 using ECommerceAPI.Persistance.Repositories.File;
 using ECommerceAPI.Persistance.Repositories.InvoiceFile;
 using ECommerceAPI.Persistance.Services;
@@ -39,7 +41,13 @@ namespace ECommerceAPI.Persistance
             services.AddScoped<IInvoiceFileReadRepository, InvoiceFileReadRepository>();
             services.AddScoped<IFileReadRepository, FileReadRepository>();  
             services.AddScoped<IFileWriteRepository, FileWriteRepository>();  
-            services.AddScoped<IProductImageFileWriteRepository, ProductImageFileWriteRepository>(); 
+            services.AddScoped<IProductImageFileWriteRepository, ProductImageFileWriteRepository>();
+            services.AddScoped<ICategoryReadRepository, CategoryReadRepository>();
+            services.AddScoped<ICategoryWriteRepository, CategoryWriteRepository>();
+
+
+
+
             services.AddScoped<IUserService,UserService>(); 
             services.AddScoped<IProductImageFileReadRepository, ProductImageFileReadRepository>();  
             services.AddScoped<IAuthService, AuthService>();
@@ -55,6 +63,7 @@ namespace ECommerceAPI.Persistance
             services.AddScoped<ICompletedOrderWriteRepository, CompletedOrderWriteRepository>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<ICategoryService, CategoryService>();
             
             
 

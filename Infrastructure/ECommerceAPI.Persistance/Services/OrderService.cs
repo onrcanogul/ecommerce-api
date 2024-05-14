@@ -133,14 +133,14 @@ namespace ECommerceAPI.Persistance.Services
                 throw new Exception("Order is not found");
         }
 
-        public async Task<GetAllOrders> GetAllOrdersAsync(int page, int size)
+        public async Task<GetOrders> GetAllOrdersAsync(int page, int size)
         {
             IQueryable<Order> query = getAllQueries().AsQueryable();
 
             return await getAllsResults(query, page, size);
         }
 
-        public async Task<GetAllOrders> GetActiveUsersOrdersAsync(int page, int size)
+        public async Task<GetOrders> GetActiveUsersOrdersAsync(int page, int size)
         {
             string id = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var query = getAllQueries().Where(o => o.Basket.UserId == id);
@@ -158,7 +158,7 @@ namespace ECommerceAPI.Persistance.Services
                 .ThenInclude(b => b.Product);               
         }
 
-        private async Task<GetAllOrders> getAllsResults(IQueryable<Order> query, int page, int size)
+        private async Task<GetOrders> getAllsResults(IQueryable<Order> query, int page, int size)
         {
            var datas = query.Skip(page * size).Take(size);
             var newDatas = from order in datas

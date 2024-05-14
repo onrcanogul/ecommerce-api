@@ -11,12 +11,12 @@ namespace ECommerceAPI.Application.Abstractions.Services
     public interface IOrderService
     {
         Task CreateOrderAsync(CreateOrder createOrder);
-        Task<GetAllOrders> GetAllOrdersAsync(int page, int size);
+        Task<GetOrders> GetAllOrdersAsync(int page, int size);
         Task<SingleOrder> GetOrderByIdAsync(string id);
         Task<(bool,CompletedOrderDto)> CompleteOrderAsync(string orderId);
         Task DeleteOrder(string id);
         
-        Task <GetAllOrders> GetActiveUsersOrdersAsync(int page, int size);
+        Task <GetOrders> GetActiveUsersOrdersAsync(int page, int size);
 
     }
 }

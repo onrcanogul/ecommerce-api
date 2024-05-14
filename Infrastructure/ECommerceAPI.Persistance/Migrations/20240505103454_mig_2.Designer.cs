@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace ECommerceAPI.Persistance.Migrations
 {
     [DbContext(typeof(ECommerceAPIDbContext))]
-    [Migration("20240421185830_mig_3")]
-    partial class mig_3
+    [Migration("20240505103454_mig_2")]
+    partial class mig_2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -311,7 +311,13 @@ namespace ECommerceAPI.Persistance.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("Products");
                 });
@@ -513,6 +519,17 @@ namespace ECommerceAPI.Persistance.Migrations
                     b.Navigation("Basket");
                 });
 
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Product", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Identity.AppUser", "User")
+                        .WithMany("Products")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("ECommerceAPI.Domain.Entities.Identity.AppRole", null)
@@ -590,6 +607,8 @@ namespace ECommerceAPI.Persistance.Migrations
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Identity.AppUser", b =>
                 {
                     b.Navigation("Baskets");
+
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Order", b =>

@@ -56,7 +56,7 @@ namespace ECommerceAPI.Persistance.Services
             await _productWriteRepository.SaveAsync();
         }
 
-        public async Task<ListProduct> GetActiveUsersProducts(int page, int size)
+        public async Task<GetProducts> GetActiveUsersProducts(int page, int size)
         {
             var query = _productReadRepository.Table.Include(x => x.User).Where(p => p.UserId == getActiveUserId());
             var datas = await query.Skip(page * size).Take(size).Select(x => new
@@ -92,7 +92,7 @@ namespace ECommerceAPI.Persistance.Services
             };
         }
 
-        public ListProduct GetProducts(int page, int size)
+        public GetProducts GetProducts(int page, int size)
         {
             var totalCount = _productReadRepository.GetAll(false).Count();
             var products = _productReadRepository.GetAll(false).Skip(page * size).Take(size).Include(p => p.ProductImageFiles).Select(p => new

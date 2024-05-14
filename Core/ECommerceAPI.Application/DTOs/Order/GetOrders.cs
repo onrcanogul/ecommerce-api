@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ECommerceAPI.Application.DTOs.Order
 {
-    public class GetAllOrders
+    public class GetOrders
     {
         public int TotalCount { get; set; }
         public object Order { get; set; } //list<object>

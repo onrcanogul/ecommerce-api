@@ -20,7 +20,7 @@ namespace ECommerceAPI.Application.Features.Queries.ProductQueries.GetActiveUser
 
         public async Task<GetActiveUsersProductsCommandResponse> Handle(GetActiveUsersProductsCommandRequest request, CancellationToken cancellationToken)
         {
-          ListProduct datas = await _productService.GetActiveUsersProducts(request.Page, request.Size);
+          GetProducts datas = await _productService.GetActiveUsersProducts(request.Page, request.Size);
             return new()
             {
                 Products = datas.Products,

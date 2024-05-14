@@ -22,6 +22,21 @@ namespace ECommerceAPI.Persistance.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("CategoryProduct", b =>
+                {
+                    b.Property<Guid>("CategoriesId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ProductsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("CategoriesId", "ProductsId");
+
+                    b.HasIndex("ProductsId");
+
+                    b.ToTable("CategoryProduct");
+                });
+
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Basket", b =>
                 {
                     b.Property<Guid>("Id")
@@ -73,6 +88,27 @@ namespace ECommerceAPI.Persistance.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("BasketItems");
+                });
+
+            modelBuilder.Entity("ECommerceAPI.Domain.Entities.Category", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.CompletedOrder", b =>
@@ -458,6 +494,21 @@ namespace ECommerceAPI.Persistance.Migrations
                         .HasColumnType("boolean");
 
                     b.HasDiscriminator().HasValue("ProductImageFile");
+                });
+
+            modelBuilder.Entity("CategoryProduct", b =>
+                {
+                    b.HasOne("ECommerceAPI.Domain.Entities.Category", null)
+                        .WithMany()
+                        .HasForeignKey("CategoriesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("ECommerceAPI.Domain.Entities.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ECommerceAPI.Domain.Entities.Basket", b =>

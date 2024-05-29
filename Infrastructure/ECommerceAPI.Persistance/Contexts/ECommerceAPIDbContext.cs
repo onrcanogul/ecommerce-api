@@ -28,17 +28,14 @@ namespace ECommerceAPI.Persistance.Contexts
         public DbSet<BasketItem> BasketItems { get; set; }
         public DbSet<Basket> Baskets { get; set; }
         public DbSet<CompletedOrder> CompletedOrders { get; set; }
+ 
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<Order>()
                 .HasKey(o => o.Id);
 
-            //builder.Entity<Product>()
-            //     .HasOne(p => p.User)
-            //     .WithMany(u => u.Products)
-            //     .HasForeignKey(p => p.UserId);
-
+           
 
             builder.Entity<Order>()
                 .HasIndex(o => o.OrderCode)
@@ -61,7 +58,7 @@ namespace ECommerceAPI.Persistance.Contexts
         {
             var datas = ChangeTracker.Entries<BaseEntity>();
             foreach (var data in datas)
-            { 
+            {
                 _ = data.State switch
                 {
                     EntityState.Added => data.Entity.CreatedDate = DateTime.UtcNow,
@@ -72,5 +69,7 @@ namespace ECommerceAPI.Persistance.Contexts
             }
             return await base.SaveChangesAsync(cancellationToken);
         }
+
+
     }
 }

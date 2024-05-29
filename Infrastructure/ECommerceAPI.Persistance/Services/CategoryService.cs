@@ -1,17 +1,14 @@
 ﻿using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.DTOs.Category;
+using ECommerceAPI.Application.Repositories;
 using ECommerceAPI.Application.Repositories.Category;
 using ECommerceAPI.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECommerceAPI.Persistance.Services
 {
-    public class CategoryService(ICategoryWriteRepository _categoryWriteRepository, ICategoryReadRepository _categoryReadRepository) : ICategoryService
+    public class CategoryService(ICategoryWriteRepository _categoryWriteRepository, ICategoryReadRepository _categoryReadRepository,
+        IProductReadRepository _productReadRepository) : ICategoryService
     {
         
         public async Task CreateCategoryAsync(string name)
@@ -29,21 +26,30 @@ namespace ECommerceAPI.Persistance.Services
             await _categoryWriteRepository.SaveAsync();
         }
 
-        public async Task<GetCategories> GetAllCategoriesAsync()
+        
+
+        public async Task<GetCategories> GetAllCategoriesAsync(int page, int size)
         {
-           List<Category> categories = await _categoryReadRepository.GetAll().Include(c => c.Products).ToListAsync();
+            var query = _categoryReadRepository.GetAll();
+
+            List<Category> categories = null;
+
+            if(page == -1 || size == -1) 
+                categories = await query.ToListAsync();       
+            else          
+                categories = await query.Skip(page * size).Take(size).ToListAsync();
+            
 
             var newData = categories.Select(c => new
             {
                 Name = c.Name,
-                Products = c.Products,
                 Id = c.Id 
             });
 
             return new()
             {
                 Categories = newData,
-                totalCount = categories.Count
+                totalCount = query.Count()
             };
         }
 
@@ -53,5 +59,7 @@ namespace ECommerceAPI.Persistance.Services
             category.Name = name;
             await _categoryWriteRepository.SaveAsync();
         }
+
+        
     }
 }

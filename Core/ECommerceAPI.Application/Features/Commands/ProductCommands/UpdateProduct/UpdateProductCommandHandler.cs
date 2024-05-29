@@ -16,13 +16,14 @@ namespace ECommerceAPI.Application.Features.Commands.ProductCommands.UpdateProdu
 
         public async Task<UpdateProductCommandResponse> Handle(UpdateProductCommandRequest request, CancellationToken cancellationToken)
         {
-            await _productService.UpdateProduct(request.Id, request.Name, request.Price, request.Stock);
-            //Product product = await _productReadRepository.GetByIdAsync(request.Id);
-            //product.Name = request.Name;
-            //product.Price = request.Price;
-            //product.Stock = request.Stock;
-            //_productWriteRepository.Update(product);
-            //await _productWriteRepository.SaveAsync();
+            await _productService.UpdateProduct(new() {
+               ProductId = request.Id,
+               Name = request.Name,
+               Price = request.Price,
+               Stock = request.Stock,
+               Categories = request.Categories
+            });
+            
 
             return new();
         }

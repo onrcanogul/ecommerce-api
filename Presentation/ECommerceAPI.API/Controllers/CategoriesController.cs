@@ -31,8 +31,8 @@ namespace ECommerceAPI.API.Controllers
             UpdateCategoryCommandResponse response = await _mediator.Send(request);
             return Ok(response);
         }
-        [HttpDelete]
-        public async Task<IActionResult> DeleteCategory(DeleteCategoryCommandRequest request)
+        [HttpDelete("{Id}")]
+        public async Task<IActionResult> DeleteCategory([FromRoute]DeleteCategoryCommandRequest request)
         {
             DeleteCategoryCommandResponse response = await _mediator.Send(request);
             return Ok(response);

@@ -1,5 +1,4 @@
-﻿using System.Net;
-using ECommerceAPI.Application.Abstractions.Storage;
+﻿using ECommerceAPI.Application.Abstractions.Services;
 using ECommerceAPI.Application.Consts;
 using ECommerceAPI.Application.CustomAttributes;
 using ECommerceAPI.Application.Enums;
@@ -13,15 +12,12 @@ using ECommerceAPI.Application.Features.Queries.ProductImageFileQueries.GetImage
 using ECommerceAPI.Application.Features.Queries.ProductQueries.GetActiveUserProducts;
 using ECommerceAPI.Application.Features.Queries.ProductQueries.GetAllProducts;
 using ECommerceAPI.Application.Features.Queries.ProductQueries.GetByIdProduct;
-using ECommerceAPI.Application.Repositories;
-using ECommerceAPI.Application.RequestParameters;
-using ECommerceAPI.Application.ViewModels.Products;
-using ECommerceAPI.Domain.Entities;
+using ECommerceAPI.Application.Features.Queries.ProductQueries.GetProductsByCategory;
+using ECommerceAPI.Application.Features.Queries.ProductQueries.GetProductsWithPriceFilter;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Net;
 
 namespace ECommerceAPI.API.Controllers
 {
@@ -30,12 +26,13 @@ namespace ECommerceAPI.API.Controllers
 
     public class ProductsController : ControllerBase
     {
-
+        readonly IProductService productService;
         readonly IMediator _mediator;
-        public ProductsController(IMediator mediator)
+        public ProductsController(IMediator mediator, IProductService productService)
         {
 
             _mediator = mediator;
+            this.productService = productService;
         }
 
         [HttpGet]
@@ -61,16 +58,15 @@ namespace ECommerceAPI.API.Controllers
         }       
         [HttpPost]
         [Authorize(AuthenticationSchemes = "Admin")]
-        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, Definition = "Create a product", Action = ActionType.Writing)]
         public async Task<IActionResult> Post(CreateProductCommandRequest createProductCommandRequest)
         {
             CreateProductCommandResponse response = await _mediator.Send(createProductCommandRequest);
             return StatusCode((int)HttpStatusCode.Created);
         }
 
-        [HttpPut]
+        [HttpPut("update-product")]
         [Authorize(AuthenticationSchemes = "Admin")]
-        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, Definition = "Update a product", Action = ActionType.Updating)]
+      
         public async Task<IActionResult> Put(UpdateProductCommandRequest request)
         {
             UpdateProductCommandResponse response = await _mediator.Send(request);
@@ -79,7 +75,7 @@ namespace ECommerceAPI.API.Controllers
 
         [HttpDelete("{Id}")]
         [Authorize(AuthenticationSchemes = "Admin")]
-        [AuthorizeDefinition(Menu = AuthorizeDefinitionConstants.Products, Definition = "Remove a product", Action = ActionType.Deleting)]
+        
         public async Task<IActionResult> Delete([FromRoute]DeleteProductCommandRequest request)
         {
             DeleteProductCommandResponse response = await _mediator.Send(request);
@@ -125,5 +121,17 @@ namespace ECommerceAPI.API.Controllers
             return Ok(response);
         }
 
+        [HttpGet("get-product-by-category")]
+        public async Task<IActionResult> GetProductsByCategory([FromQuery]GetProductsByCategoryQueryRequest request)
+        {
+            GetProductsByCategoryQueryResponse response =  await _mediator.Send(request);
+            return Ok(response);
+        }
+        [HttpGet("get-product-with-filter")]
+        public async Task<IActionResult> GetProductWithPriceFilter([FromQuery]GetProductsWithPriceFilterQueryRequest request)
+        {
+            GetProductsWithPriceFilterQueryResponse response = await _mediator.Send(request);
+            return Ok(response);
+        }
     }
 }

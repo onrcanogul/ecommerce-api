@@ -13,7 +13,7 @@ namespace ECommerceAPI.Application.Features.Queries.Category.GetCategories
     {
         public async Task<GetCategoriesQueryResponse> Handle(GetCategoriesQueryRequest request, CancellationToken cancellationToken)
         {
-           Application.DTOs.Category.GetCategories categories =  await _categoryService.GetAllCategoriesAsync();
+           Application.DTOs.Category.GetCategories categories =  await _categoryService.GetAllCategoriesAsync(request.Page,request.Size);
             return new()
             {
                 Categories = categories.Categories,

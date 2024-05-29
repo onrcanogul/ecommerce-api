@@ -13,5 +13,6 @@ namespace ECommerceAPI.Application.Features.Commands.ProductCommands.UpdateProdu
         public string Name { get; set; }
         public int Stock { get; set; }
         public float Price { get; set; }
+        public List<string> Categories { get; set; }
     }
 }

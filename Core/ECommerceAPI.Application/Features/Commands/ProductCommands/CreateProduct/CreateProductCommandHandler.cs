@@ -24,7 +24,8 @@ namespace ECommerceAPI.Application.Features.Commands.ProductCommands.CreateProdu
             {
                 Name = request.Name,
                 Price = request.Price,
-                Stock = request.Stock
+                Stock = request.Stock,
+                CategoryId = request.CategoryId
             });
             
             await _productHubService.ProductAddedMessageAsync($"{request.Name} is added");

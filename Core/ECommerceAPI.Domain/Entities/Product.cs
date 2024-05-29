@@ -21,7 +21,7 @@ namespace ECommerceAPI.Domain.Entities
         public ICollection<Order> Orders { get; set; }
         public ICollection<BasketItem> BasketItems { get; set; }
         public ICollection<ProductImageFile> ProductImageFiles { get; set; }
-        public ICollection<Category>  Categories{ get; set; }
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
 
     }
 }

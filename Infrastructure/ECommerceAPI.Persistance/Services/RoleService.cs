@@ -76,8 +76,6 @@ namespace ECommerceAPI.Persistance.Services
             {
                 var userRoles = await _userManager.GetRolesAsync(user);
                 await _userManager.RemoveFromRolesAsync(user, userRoles);
-
-
                 await  _userManager.AddToRolesAsync(user, roles);
                 return true;
             }
